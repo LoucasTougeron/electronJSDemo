@@ -1,18 +1,40 @@
 <template>
-
-  <!--  Navigation-->
+  <!-- Navigation -->
   <ul uk-tab>
-    <li class="uk-active">
-      <router-link to="/">Page One</router-link>
+    <!-- Non connecté -->
+    <li v-if="!isLoggedIn">
+      <router-link to="/">Connexion</router-link>
     </li>
-    <li>
-      <router-link to="/page-2">Page Two</router-link>
+
+    <!-- Connecté -->
+    <li v-if="isLoggedIn">
+      <router-link to="/articles-list">Les articles</router-link>
+    </li>
+    <li v-if="isLoggedIn">
+      <a href="#" @click.prevent="logout">Déconnexion</a>
     </li>
   </ul>
 
-  <!-- Fonctionnement Vue pour en temps remplacer la page activer -->
-  <router-view/>
+  <!-- Vue router -->
+  <router-view />
 </template>
 
-<script setup lang="ts">
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const isLoggedIn = ref(!!localStorage.getItem('token'));
+
+// Fonction pour déconnexion
+function logout() {
+  localStorage.removeItem('token');
+  isLoggedIn.value = false;
+  window.location.href = '/';
+}
+
+// Écouter l'événement global pour mise à jour du login
+onMounted(() => {
+  window.addEventListener('auth-change', () => {
+    isLoggedIn.value = !!localStorage.getItem('token');
+  });
+});
 </script>
